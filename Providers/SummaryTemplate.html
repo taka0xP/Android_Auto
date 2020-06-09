@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://cdn.staticfile.org/echarts/4.3.0/echarts.min.js"></script>
+    <title>App自动化测试聚合报告</title>
+</head>
+<body>
+<br>
+<h1 style="padding-left: 30px">App自动化测试聚合报告</h1>
+<br>
+<br>
+<div class="top-summary" style="width: 98%; margin: 0 auto">
+    <div id="total" align="left" style="float: left; padding-left: 20px">
+        <br>
+        <h3>全部统计：</h3>
+        <h5>通过：{{ pass_num }}</h5>
+        <h5>失败：{{ failed_num }}</h5>
+        <h5>错误：{{ error_num }}</h5>
+        <br>
+        <h5>开始时间：{{ start_time }}</h5>
+        <h5>结束时间：{{ end_time }}</h5>
+        <h5>运行时长：{{ take_time }}</h5>
+        <br>
+    </div>
+    <div id="e_charts" align="right" style="padding-right: 100px">
+        <div id="main" style="width: 620px;height:450px;"></div>
+        <script type="text/javascript">
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('main'));
+            option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                color: ['#8fc31f','#f35833','#00ccff','#ffcc00','#FF37AC', '#2A23FF'],
+                legend: {
+                    orient: 'vertical',
+                    x: 'right',
+                    data: ['孙凯', '许思瑞', '张宇峰', '李佳颖', '王立轩', '李君'],
+                    formatter: function (name) {
+                        var oa = option.series[0].data;
+                        var num = oa[0].value + oa[1].value + oa[2].value + oa[3].value;
+                        for (var i = 0; i < option.series[0].data.length; i++) {
+                            if (name == oa[i].name) {
+                                return name + '     ' + oa[i].value + '     ' + (oa[i].value / num * 100).toFixed(2) + '%';
+                            }
+                        }
+                    }
+                },
+                series: [
+                    {
+                        name: '未通过case分布',
+                        type: 'pie',
+                        radius: '55%',
+                        center: ['40%', '50%'],
+                        data: {{ charts_data }},
+                        itemStyle: {
+                            emphasis: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        },
+                        itemStyle: {
+                            normal: {
+                                label: {
+                                    show: true,
+//	                            position:'inside',
+                                    formatter: '{b} : {c} ({d}%)'
+                                }
+                            },
+                            labelLine: {show: true}
+                        }
+                    }
+                ]
+            };
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+        </script>
+    </div>
+</div>
+<br>
+<div style="width: 70%; padding-left: 20px">
+    <h3>模块数据统计：</h3>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th scope="col">序号</th>
+            <th scope="col">模块</th>
+            <th scope="col">负责人</th>
+            <th scope="col">case总数</th>
+            <th scope="col">失败数</th>
+            <th scope="col">错误数</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for model in mapping_data %}
+        <tr>
+            <th scope="row">{{ model['num'] }}</th>
+            <td>{{ model['file'] }}</td>
+            <td>{{ model['people'] }}</td>
+            <td>{{ model['count'] }}</td>
+            <td>{{ model['failed'] }}</td>
+            <td>{{ model['error'] }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="base-container" style="width: 98%; margin: 0 auto">
+    <h3>子模块数据统计：</h3>
+    <table class="table">
+        <thead class="thead-light">
+        <tr>
+            <th scope="col">序号</th>
+            <th scope="col">用例名称</th>
+            <th scope="col">开始时间</th>
+            <th scope="col">运行时长</th>
+            <th scope="col">运行结果</th>
+            <th scope="col">查看详细</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in all_data %}
+        <tr>
+            <th scope="row">{{ item['case_num'] }}</th>
+            <td>{{ item['case_name'] }}</td>
+            <td>{{ item['start_time'] }}</td>
+            <td>{{ item['run_time'] }}</td>
+            <td>通过：{{item['run_result']['通过']}} 失败：{{item['run_result']['失败']}} 错误：{{item['run_result']['错误']}}</td>
+            <td><a href="{{ item['case_name'] + '.html' }}">查看详细</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

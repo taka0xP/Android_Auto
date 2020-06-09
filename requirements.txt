@@ -1,0 +1,11 @@
+requests==2.22.0
+numpy==1.17.4
+xlrd==1.2.0
+selenium==3.141.0
+loguru==0.4.1
+opencv_python==4.1.2.30
+PyMySQL==0.9.3
+Jinja2==3.0.0a1
+Appium_Python_Client==0.51
+beautifulsoup4==4.9.0
+Pillow==7.1.1
